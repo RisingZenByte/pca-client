@@ -1,0 +1,10 @@
+pluginManagement {
+	repositories {
+		maven { name = 'Fabric'; url = 'https://maven.fabricmc.net/' }
+		maven { name = 'FallenBreath'; url = 'https://maven.fallenbreath.me/releases' }
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'pca-client'
