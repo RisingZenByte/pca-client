@@ -37,9 +37,39 @@ jobs:
           JAR=$(ls build/libs/pca-client-*-mc*.jar | grep -v sources)
           echo "jar=$JAR" >> "$GITHUB_OUTPUT"
 
+      - name: Write release notes (中文)
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          MOD_VER="${TAG#v}"
+          MOD_VER="${MOD_VER%-mc*}"
+          MC_VER="${TAG##*-mc}"
+          {
+            echo "## Minecraft ${MC_VER} · ${MOD_VER}"
+            echo ""
+            echo "### 下载"
+            echo "从下方 **Assets** 下载 \`pca-client-${MOD_VER}-mc${MC_VER}.jar\`，放入**客户端** \`mods/\` 文件夹。"
+            echo ""
+            echo "### 依赖"
+            echo "- Minecraft ${MC_VER}"
+            echo "- Fabric Loader ≥ 0.19.3"
+            echo "- Fabric API（${MC_VER} 版本）"
+            echo "- [MaLiLib](https://modrinth.com/mod/malilib)（${MC_VER} 版本）"
+            echo "- [Tweakeroo](https://modrinth.com/mod/tweakeroo)（${MC_VER} 版本）"
+            echo ""
+            echo "> **注意：** 不要与 MasaGadget 或服务端 mod \`carpet-pls-addition\` 同时安装在客户端。"
+            echo ""
+            echo "### 服务端配套"
+            echo "服务端需安装同 MC 版本的 [carpet-pls-addition](https://github.com/RisingZenByte/carpet-pls-addition/releases)，并执行 \`/pls pcaSyncProtocol true\`。"
+            echo ""
+            echo "### 使用"
+            echo "1. 连接已开启 PCA 协议的服务器"
+            echo "2. 日志出现 \`PCA sync protocol enabled by server\`"
+            echo "3. 在 Tweakeroo 中开启 **Inventory Preview** 并按住快捷键"
+          } > release-notes.md
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.asset.outputs.jar }}
-          generate_release_notes: true
+          body_path: release-notes.md
           fail_on_unmatched_files: true
