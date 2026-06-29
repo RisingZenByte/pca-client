@@ -1,11 +1,23 @@
 # PCA Client
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](LICENSE)
-[![Minecraft](https://img.shields.io/badge/Minecraft-26.2-green.svg)](https://minecraft.net)
+[![Releases](https://img.shields.io/github/v/release/RisingZenByte/pca-client?label=release)](https://github.com/RisingZenByte/pca-client/releases)
 
 轻量 **PCA 同步协议客户端**，配合服务端 [carpet-pls-addition](https://github.com/RisingZenByte/carpet-pls-addition) 使用，为 **Tweakeroo 容器预览** 提供多人游戏数据同步。
 
-> 替代 MasaGadget 在 26.2 上缺失的 PCA 客户端功能；**不要**与 MasaGadget 或客户端版 `carpet-pls-addition` 同时安装。
+> 替代 MasaGadget 在部分新版本上缺失的 PCA 客户端功能；**不要**与 MasaGadget 或客户端版 `carpet-pls-addition` 同时安装。
+
+---
+
+## 支持版本
+
+本项目会随 Minecraft 更新持续维护。请从 [Releases](https://github.com/RisingZenByte/pca-client/releases) 下载与客户端 **相同 MC 版本** 的 jar，并与服务端 [carpet-pls-addition](https://github.com/RisingZenByte/carpet-pls-addition) 的对应版本配套使用。
+
+| Minecraft | Mod 版本 | 状态 |
+|-----------|----------|------|
+| **26.2** | 1.0.0 | 当前支持 |
+
+Release 标签格式：`v{mod版本}-mc{mc版本}`（例如 `v1.0.0-mc26.2`）。
 
 ---
 
@@ -15,16 +27,16 @@
 
 | 依赖 | 必须 |
 |------|------|
-| Minecraft 26.2 | ✓ |
+| Minecraft（与 jar 匹配） | ✓ |
 | Fabric Loader ≥ 0.19.3 | ✓ |
 | Fabric API | ✓ |
-| [MaLiLib](https://www.curseforge.com/minecraft/mc-mods/malilib) 26.2 | ✓ |
-| [Tweakeroo](https://www.curseforge.com/minecraft/mc-mods/tweakeroo) 26.2 | ✓ |
-| **pca-client** | ✓ |
+| [MaLiLib](https://modrinth.com/mod/malilib)（同 MC 版本） | ✓ |
+| [Tweakeroo](https://modrinth.com/mod/tweakeroo)（同 MC 版本） | ✓ |
+| **pca-client**（同 MC 版本） | ✓ |
 
 ### 服务端（不是本 mod）
 
-安装 [carpet-pls-addition](https://github.com/RisingZenByte/carpet-pls-addition) 并执行：
+安装同 MC 版本的 [carpet-pls-addition](https://github.com/RisingZenByte/carpet-pls-addition) 并执行：
 
 ```
 /pls pcaSyncProtocol true
@@ -47,7 +59,7 @@
 
 ## 编译
 
-本地编译前，将 MaLiLib、Tweakeroo 26.2 的 jar 放入 `libs/`（见 `libs/README.md`），或从 Modrinth 下载 0.29.2 版本。
+本地编译前，将对应 MC 版本的 MaLiLib、Tweakeroo jar 放入 `libs/`（见 `libs/README.md`）。GitHub Actions 会自动下载当前版本的依赖。
 
 ```powershell
 git clone https://github.com/RisingZenByte/pca-client.git
@@ -56,6 +68,8 @@ cd pca-client
 ```
 
 产物：`build/libs/pca-client-*.jar`
+
+新版本跟进时，更新 `gradle.properties` 中的 `minecraft_version` 及 `libs/` 中的 compile-only 依赖即可。
 
 ---
 
