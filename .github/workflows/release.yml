@@ -31,11 +31,15 @@ jobs:
           chmod +x gradlew
           ./gradlew build
 
+      - name: Resolve release jar
+        id: asset
+        run: |
+          JAR=$(ls build/libs/pca-client-*-mc*.jar | grep -v sources)
+          echo "jar=$JAR" >> "$GITHUB_OUTPUT"
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            build/libs/pca-client-*.jar
-            !**/*-sources.jar
+          files: ${{ steps.asset.outputs.jar }}
           generate_release_notes: true
           fail_on_unmatched_files: true
