@@ -14,13 +14,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
 import pls.pca.client.ModInfo;
+import pls.pca.client.sync.PcaDataSyncer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,7 +77,11 @@ public final class PcaClientProtocol
 	{
 		FanetlibClientEvents.registerDisconnectListener(client -> {
 			ModInfo.LOGGER.debug("PCA client disconnect");
-			enabled = false;
+			if (enabled)
+			{
+				enabled = false;
+				PcaDataSyncer.onProtocolDisabled();
+			}
 			lastBlockPos = null;
 			lastEntityId = -1;
 		});
@@ -98,6 +98,7 @@ public final class PcaClientProtocol
 		{
 			ModInfo.LOGGER.info("PCA sync protocol enabled by server");
 			enabled = true;
+			PcaDataSyncer.onProtocolEnabled();
 		}
 	}
 
@@ -107,6 +108,7 @@ public final class PcaClientProtocol
 		{
 			ModInfo.LOGGER.info("PCA sync protocol disabled by server");
 			enabled = false;
+			PcaDataSyncer.onProtocolDisabled();
 		}
 	}
 
@@ -129,17 +131,8 @@ public final class PcaClientProtocol
 			return;
 		}
 
-		BlockEntity blockEntity = level.getBlockEntity(pos);
-
-		if (blockEntity != null)
-		{
-			ModInfo.LOGGER.debug("Applied PCA block entity update at {}", pos);
-			try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), ModInfo.LOGGER))
-			{
-				ValueInput input = TagValueInput.create(logging, level.registryAccess(), tag);
-				blockEntity.loadWithComponents(input);
-			}
-		}
+		ModInfo.LOGGER.debug("Applied PCA block entity update at {}", pos);
+		PcaDataSyncer.getInstance().handleBlockEntityData(pos, tag);
 	}
 
 	private static void handleUpdateEntity(FriendlyByteBuf buf, PacketHandlerS2C.Context ctx)
@@ -161,19 +154,13 @@ public final class PcaClientProtocol
 			return;
 		}
 
-		Entity entity = level.getEntity(entityId);
-
-		if (entity == null)
+		if (level.getEntity(entityId) == null)
 		{
 			return;
 		}
 
 		ModInfo.LOGGER.debug("Applied PCA entity update for id {}", entityId);
-		try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(entity.problemPath(), ModInfo.LOGGER))
-		{
-			ValueInput input = TagValueInput.create(logging, entity.registryAccess(), tag);
-			entity.load(input);
-		}
+		PcaDataSyncer.getInstance().handleEntityData(entityId, tag);
 	}
 
 	public static void syncBlockEntity(BlockPos pos)
